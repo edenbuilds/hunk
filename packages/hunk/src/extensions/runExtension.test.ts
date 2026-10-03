@@ -729,6 +729,23 @@ describe("registerCommand", () => {
     expect(issues[0]?.message).toContain('Unknown modifier "ctlr"');
   });
 
+  test("rejects a key chord with an empty component instead of binding its normalized form", () => {
+    const registry = createEmptyExtensionRegistry();
+    const issues: ExtensionLoadIssue[] = [];
+
+    runExtensionFactory({
+      metadata: bundledMetadata("empty-component"),
+      registry,
+      issues,
+      factory: (hunk) => {
+        hunk.registerCommand({ id: "toggle", title: "Toggle", key: "s+" }, () => {});
+      },
+    });
+
+    expect(registry.commands).toEqual([]);
+    expect(issues[0]?.message).toContain("empty component");
+  });
+
   test("accepts a list of chords and rejects the list if any chord is bad", () => {
     const registry = createEmptyExtensionRegistry();
     const issues: ExtensionLoadIssue[] = [];

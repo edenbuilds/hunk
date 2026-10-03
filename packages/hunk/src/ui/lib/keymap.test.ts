@@ -119,6 +119,16 @@ describe("resolveCommandKeys", () => {
     expect(issues[0]?.message).toContain("not a usable key chord");
   });
 
+  test("a chord with an empty component is an issue and claims no real shortcut", () => {
+    const { keys, issues } = resolve({ "meta.toggle": ["q+", "ctrl+y"] });
+
+    // "q+" must not be read as "q", which would take the key from quit.
+    expect(keys.get("meta.toggle")).toEqual(["ctrl+y"]);
+    expect(keys.get("hunk.app.quit")).toEqual(["q"]);
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.message).toContain("not a usable key chord");
+  });
+
   test("unknown ids are reported, softly when they look like extension commands", () => {
     const { keys, issues } = resolve({ "hunk.app.quti": "x", "ghost.command": "z" });
 
